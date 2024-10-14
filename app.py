@@ -3,12 +3,7 @@ from service import Service
 from flask_cors import CORS
 
 app = Flask(__name__)
-s = Service(
-    seed = 42,
-    default_model = 'gpt-4o',
-    tokenize_level = 'word',
-    python_print=True
-)
+s = Service(seed = 42, default_model = 'gpt-4o', tokenize_level = 'word')
 CORS(app)
 
 @app.route('/process', methods=['POST'])
