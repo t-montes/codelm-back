@@ -1,4 +1,4 @@
-from utils import gptcall, serpcall, diff
+from utils import gptcall, serpcall, diff, show_diff
 from transformers import AutoTokenizer
 from typing import Callable
 import re
@@ -28,9 +28,10 @@ class Service:
     encode: Callable[[str], list]
     decode: Callable[[list], str]
 
-    def __init__(self, seed=None, default_model='gpt-4o', tokenize_level='code'):
+    def __init__(self, seed=None, default_model='gpt-4o', tokenize_level='code', python_print=False):
         self.seed = seed # seed for deterministic completions, if set
         self.default_model = default_model # default completion model to use
+        self.python_print = python_print
         match tokenize_level:
             case 'code':
                 tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")
@@ -57,6 +58,8 @@ class Service:
             )
             output_code = extract_code(combined_result)
             changes = diff(code, output_code, self.encode, self.decode)
+            if self.python_print:
+                show_diff(changes)
             return {'updatedCode': output_code, 'diff': changes}
         except Exception as e:
             return {'error': f"{e}"}

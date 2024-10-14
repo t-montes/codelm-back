@@ -6,7 +6,8 @@ app = Flask(__name__)
 s = Service(
     seed = 42,
     default_model = 'gpt-4o',
-    tokenize_level = 'word'
+    tokenize_level = 'word',
+    python_print=True
 )
 CORS(app)
 
