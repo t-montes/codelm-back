@@ -28,10 +28,9 @@ class Service:
     encode: Callable[[str], list]
     decode: Callable[[list], str]
 
-    def __init__(self, seed=42, default_model='gpt-4o', tokenize_level='code'):
+    def __init__(self, seed=None, default_model='gpt-4o', tokenize_level='code'):
         self.seed = seed # seed for deterministic completions, if set
         self.default_model = default_model # default completion model to use
-        self.tokenize_level = tokenize_level # 'word', 'line', 'char', 'code'
         match tokenize_level:
             case 'code':
                 tokenizer = AutoTokenizer.from_pretrained("gpt2")
@@ -40,11 +39,11 @@ class Service:
             case 'line':
                 self.encode = lambda x: x.splitlines()
                 self.decode = lambda x: '\n'.join(x)
-            case 'char':
-                self.encode = lambda x: list(x)
-                self.decode = lambda x: ''.join(x)
             case 'word':
-                self.encode = lambda x: re.findall(r'\w+|[^\w\s]|\s+|\n', x)
+                self.encode = lambda x: re.findall(r'\w+|[^\w\s]|\s+|\n|\r', x)
+                self.decode = lambda x: ''.join(x)
+            case _:
+                self.encode = lambda x: list(x)
                 self.decode = lambda x: ''.join(x)
     
     def process(self, prompt=None, code=None, model=None) -> dict:
