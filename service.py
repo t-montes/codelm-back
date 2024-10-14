@@ -1,5 +1,4 @@
 from utils import gptcall, serpcall, diff
-from transformers import AutoTokenizer
 from typing import Callable
 import re
 
@@ -35,6 +34,7 @@ class Service:
         self.get_diff = get_diff
         match tokenize_level:
             case 'code':
+                from transformers import AutoTokenizer
                 tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")
                 self.encode = lambda x: tokenizer.encode(x, add_special_tokens=False)
                 self.decode = lambda x: tokenizer.decode(x)
