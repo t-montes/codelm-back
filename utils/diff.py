@@ -1,10 +1,4 @@
-from transformers import AutoTokenizer
 from difflib import SequenceMatcher
-
-tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")
-
-encode = lambda x: tokenizer.encode(x)
-decode = lambda x: tokenizer.decode(x)
 
 tagmap = {
     'insert': '\033[92m',
@@ -19,7 +13,7 @@ def printso(tag, *args, **kwargs):
     if tag in tagmap:
         print('\033[0m', end='')
 
-def diff(code1, code2):
+def diff(code1, code2, encode, decode):
     tokens1 = encode(code1)
     tokens2 = encode(code2)
     similarity = SequenceMatcher(None, tokens1, tokens2)

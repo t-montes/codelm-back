@@ -1,5 +1,6 @@
-from utils import gptcall, serpcall, diff, reconstruct, show_diff
-from flask import jsonify
+from utils import gptcall, serpcall, diff
+from transformers import AutoTokenizer
+from typing import Callable
 import re
 
 system_message = """\
@@ -23,18 +24,40 @@ def extract_code(code):
         return code.group(2)
     return code
 
-def process(prompt=None, code=None, model='gpt-4o'):
-    actual_prompt = gen_prompt(prompt, code)
+class Service:
+    encode: Callable[[str], list]
+    decode: Callable[[list], str]
 
-    try:
-        combined_result = gptcall(
-            actual_prompt,
-            model=model,
-            system_message=system_message,
-            seed=42
-        )
-        output_code = extract_code(combined_result)
-        changes = diff(code, output_code)
-        return {'updatedCode': output_code, 'diff': changes}
-    except Exception as e:
-        return {'error': f"{e}"}
+    def __init__(self, seed=42, default_model='gpt-4o', tokenize_level='code'):
+        self.seed = seed # seed for deterministic completions, if set
+        self.default_model = default_model # default completion model to use
+        self.tokenize_level = tokenize_level # 'word', 'line', 'char', 'code'
+        match tokenize_level:
+            case 'code':
+                tokenizer = AutoTokenizer.from_pretrained("gpt2")
+                self.encode = lambda x: tokenizer.encode(x, add_special_tokens=False)
+                self.decode = lambda x: tokenizer.decode(x)
+            case 'line':
+                self.encode = lambda x: x.splitlines()
+                self.decode = lambda x: '\n'.join(x)
+            case 'char':
+                self.encode = lambda x: list(x)
+                self.decode = lambda x: ''.join(x)
+            case 'word':
+                self.encode = lambda x: re.findall(r'\w+|[^\w\s]|\s+|\n', x)
+                self.decode = lambda x: ''.join(x)
+    
+    def process(self, prompt=None, code=None, model=None) -> dict:
+        actual_prompt = gen_prompt(prompt, code)
+        try:
+            combined_result = gptcall(
+                actual_prompt,
+                model=model if model else self.default_model,
+                system_message=system_message,
+                seed=self.seed
+            )
+            output_code = extract_code(combined_result)
+            changes = diff(code, output_code, self.encode, self.decode)
+            return {'updatedCode': output_code, 'diff': changes}
+        except Exception as e:
+            return {'error': f"{e}"}
