@@ -1,0 +1,23 @@
+Error (HumanEval/32): [AssertionError] 
+Error (HumanEval/41): [AssertionError] 
+Error (HumanEval/65): [AssertionError] 
+Error (HumanEval/91): [AssertionError] Test 2
+Error (HumanEval/101): [AssertionError] 
+Error (HumanEval/108): [ValueError] invalid literal for int() with base 10: '-'
+Error (HumanEval/110): [AssertionError] 
+Error (HumanEval/115): [AssertionError] Error
+Error (HumanEval/119): [AssertionError] 
+Error (HumanEval/120): [AssertionError] 
+Error (HumanEval/125): [AssertionError] 
+Error (HumanEval/126): [AssertionError] This prints if this assert fails 7 (good for debugging!)
+Error (HumanEval/127): [AssertionError] 
+Error (HumanEval/130): [AssertionError] 
+Error (HumanEval/132): [AssertionError] 
+Error (HumanEval/134): [AssertionError] 
+Error (HumanEval/135): [AssertionError] 
+Error (HumanEval/141): [AssertionError] 
+Error (HumanEval/145): [AssertionError] 
+Error (HumanEval/160): [AssertionError] 
+Error (HumanEval/163): [AssertionError] Test 1
+Accuracy: 143/164 (87.20%)
+Failed tasks: ['HumanEval/32', 'HumanEval/41', 'HumanEval/65', 'HumanEval/91', 'HumanEval/101', 'HumanEval/108', 'HumanEval/110', 'HumanEval/115', 'HumanEval/119', 'HumanEval/120', 'HumanEval/125', 'HumanEval/126', 'HumanEval/127', 'HumanEval/130', 'HumanEval/132', 'HumanEval/134', 'HumanEval/135', 'HumanEval/141', 'HumanEval/145', 'HumanEval/160', 'HumanEval/163']
