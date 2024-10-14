@@ -33,7 +33,7 @@ class Service:
         self.default_model = default_model # default completion model to use
         match tokenize_level:
             case 'code':
-                tokenizer = AutoTokenizer.from_pretrained("gpt2")
+                tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")
                 self.encode = lambda x: tokenizer.encode(x, add_special_tokens=False)
                 self.decode = lambda x: tokenizer.decode(x)
             case 'line':
