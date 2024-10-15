@@ -1,9 +1,11 @@
 from serpapi import Client as SerpApiClient 
-import os
+from serpapi.exceptions import APIKeyNotProvided
 
-sp_client = SerpApiClient(api_key=os.getenv("SERPAPI_KEY"))
-
-def request(prompt):
+def request(prompt, api_key=None):
+    try:
+        sp_client = SerpApiClient(api_key=api_key)
+    except APIKeyNotProvided as e:
+        raise Exception(f"API key not valid or not provided")
     response = sp_client.get_search({
         "engine": "google",
         "q": prompt

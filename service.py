@@ -1,5 +1,6 @@
 from utils import gptcall, serpcall, diff
 from typing import Callable
+import json
 import re
 
 system_message = """\
@@ -27,11 +28,22 @@ class Service:
     encode: Callable[[str], list]
     decode: Callable[[list], str]
 
-    def __init__(self, seed=None, default_model='gpt-4o', tokenize_level='word', get_usage=False, get_diff=True):
+    def __init__(
+            self, 
+            seed=None, 
+            default_model='gpt-4o', 
+            tokenize_level='word', 
+            get_usage=False, 
+            get_diff=True, 
+            openai_api_key=None,
+            serpapi_key=None
+        ):
         self.seed = seed # seed for deterministic completions, if set
         self.default_model = default_model # default completion model to use
         self.get_usage = get_usage
         self.get_diff = get_diff
+        self.openai_api_key = openai_api_key
+        self.serpapi_key = serpapi_key
         match tokenize_level:
             case 'code':
                 from transformers import AutoTokenizer
@@ -48,7 +60,9 @@ class Service:
                 self.encode = lambda x: list(x)
                 self.decode = lambda x: ''.join(x)
     
-    def process(self, prompt=None, code=None, model=None) -> dict:
+    def process(self, prompt=None, code=None, model=None, openai_api_key=None, serpapi_key=None) -> dict:
+        openai_api_key = openai_api_key if openai_api_key else self.openai_api_key
+        serpapi_key = serpapi_key if serpapi_key else self.serpapi_key
         actual_prompt = gen_prompt(prompt, code)
         try:
             result = {}
@@ -57,7 +71,8 @@ class Service:
                 model=model if model else self.default_model,
                 system_message=system_message,
                 seed=self.seed,
-                track_usage=self.get_usage
+                track_usage=self.get_usage,
+                api_key=openai_api_key
             )
             if self.get_usage: result_code, result['usage'] = combined_result
             else: result_code = combined_result
@@ -70,4 +85,6 @@ class Service:
 
             return result
         except Exception as e:
+            if "Incorrect API key" in f"{e}":
+                return {'error': "Incorrect API key"}
             return {'error': f"{e}"}

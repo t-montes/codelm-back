@@ -1,10 +1,9 @@
 from openai import OpenAI as OpenAiClient
-from openai._exceptions import ContentFilterFinishReasonError, RateLimitError
+from openai._exceptions import ContentFilterFinishReasonError, RateLimitError, AuthenticationError
 import time
 
-gpt_client = OpenAiClient() # OPENAI_API_KEY
-
-def request(prompt, model='gpt-4o', system_message=None, prev_msgs=[], max_retries=3, retry_delay=60, try_count=0, max_tokens=4096, temperature=0, seed=None, track_usage=False):
+def request(prompt, model='gpt-4o', api_key=None, system_message=None, prev_msgs=[], max_retries=3, retry_delay=60, try_count=0, max_tokens=4096, temperature=0, seed=None, track_usage=False):
+    gpt_client = OpenAiClient(api_key=api_key) # OPENAI_API_KEY
     msgs = prev_msgs
     if system_message:
         msgs.append({"role": "system", "content": system_message})
@@ -33,3 +32,5 @@ def request(prompt, model='gpt-4o', system_message=None, prev_msgs=[], max_retri
             time.sleep(retry_delay)
             return request(prompt, model, system_message, prev_msgs, max_retries, retry_delay, try_count+1, max_tokens, temperature, seed, track_usage)
         raise e
+    except AuthenticationError as e:
+        raise AuthenticationError(f"API key not valid or not provided")
