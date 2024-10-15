@@ -1,4 +1,9 @@
 from difflib import SequenceMatcher
+import re
+
+# word-level encoding/decoding
+encode = lambda x: re.findall(r'\w+|[^\w\s]|\s+|\n|\r', x)
+decode = lambda x: ''.join(x)
 
 tagmap = {
     'insert': '\033[92m',
@@ -25,7 +30,7 @@ def show_diff(changes, original=False):
     else:
         for tag, _, updated in changes: printso(tag, updated, end='')
 
-def diff(code1, code2, encode, decode):
+def diff(code1, code2, encode=encode, decode=decode):
     tokens1 = encode(code1)
     tokens2 = encode(code2)
     similarity = SequenceMatcher(None, tokens1, tokens2)
