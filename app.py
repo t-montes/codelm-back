@@ -16,7 +16,11 @@ CORS(app)
 def process():
     data = request.get_json()
     try:
-        openai_api_key, serpapi_key = request.headers['Authorization'].replace('Bearer ', '').split(';')
+        keys = request.headers['Authorization'].replace('Bearer ', '').split(';')
+        if len(keys) == 2:
+            openai_api_key, serpapi_key = keys
+        else:
+            openai_api_key, serpapi_key = keys[0], None 
     except:
         openai_api_key, serpapi_key = None, None
     response = s.process(openai_api_key=openai_api_key, serpapi_key=serpapi_key, **data)
