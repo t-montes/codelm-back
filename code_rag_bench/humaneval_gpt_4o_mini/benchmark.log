@@ -1,0 +1,25 @@
+Error (HumanEval/10): [AssertionError] 
+Error (HumanEval/32): [AssertionError] 
+Error (HumanEval/40): [AssertionError] 
+Error (HumanEval/65): [AssertionError] 
+Error (HumanEval/74): [AssertionError] 
+Error (HumanEval/76): [AssertionError] This prints if this assert fails 2 (also good for debugging!)
+Error (HumanEval/77): [TypeError] type complex doesn't define __round__ method
+Error (HumanEval/83): [AssertionError] 
+Error (HumanEval/91): [AssertionError] Test 2
+Error (HumanEval/108): [AssertionError] 
+Error (HumanEval/115): [AssertionError] Error
+Error (HumanEval/118): [AssertionError] 
+Error (HumanEval/120): [AssertionError] 
+Error (HumanEval/126): [AssertionError] This prints if this assert fails 7 (good for debugging!)
+Error (HumanEval/127): [AssertionError] 
+Error (HumanEval/130): [AssertionError] 
+Error (HumanEval/132): [AssertionError] 
+Error (HumanEval/134): [AssertionError] 
+Error (HumanEval/137): [AssertionError] 
+Error (HumanEval/140): [AssertionError] This prints if this assert fails 3 (good for debugging!)
+Error (HumanEval/145): [AssertionError] 
+Error (HumanEval/160): [AssertionError] 
+Error (HumanEval/163): [AssertionError] Test 1
+Accuracy: 141/164 (85.98%)
+Failed tasks: ['HumanEval/10', 'HumanEval/32', 'HumanEval/40', 'HumanEval/65', 'HumanEval/74', 'HumanEval/76', 'HumanEval/77', 'HumanEval/83', 'HumanEval/91', 'HumanEval/108', 'HumanEval/115', 'HumanEval/118', 'HumanEval/120', 'HumanEval/126', 'HumanEval/127', 'HumanEval/130', 'HumanEval/132', 'HumanEval/134', 'HumanEval/137', 'HumanEval/140', 'HumanEval/145', 'HumanEval/160', 'HumanEval/163']
