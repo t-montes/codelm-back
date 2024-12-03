@@ -1,4 +1,4 @@
-from utils import gptcall, serpcall, diff
+from utils import gptcall, tgtcall, serpcall, diff
 from typing import Callable
 import json
 import re
@@ -7,16 +7,20 @@ system_message = """\
 Given the user query and starting code, return only the code for solving it. \
 Only change/add what is required to solve the query. \
 Adhere and edit/add directly on the user's code so that there are as least deletions as possible, only where required. \
-Do not remove/update code (nor documentation) if it's not directly required from the query!!\
+Do not remove/update code (nor documentation) if it's not directly required from the query! \
+For example, if the user query is a function definition, keep the function name and parameters as is, and only update the function body, unless stated. \
+The user may or may not provide ground-truth documents useful for solving the query. If they are provided, use them properly. \
 """
 
-def gen_prompt(prompt, code):
-    if prompt and code:
-        return f"User query: {prompt}\nUser code: {code}"
-    elif prompt:
-        return f"User query: {prompt}. Please provide the code to solve it."
-    elif code:
-        return f"User query: Solve the requirements stated in the code\nUser code: {code}"
+def gen_prompt(prompt, code, gt_docs):
+    if not prompt:
+        prompt = "Solve the requirements stated in the code"
+    if code: code = f"\nUser code:\n```python\n{code}\n```"
+    else: code = ". Please provide the code to solve it."
+    if gt_docs: gt_docs = f"\nGround-truth documents:\n{gt_docs}"
+    else: gt_docs = ""
+    
+    return f"{prompt}{code}{gt_docs}"
 
 def extract_code(code):
     code = re.search(r'```(.*?)\n(.*?)```', code, re.DOTALL)
@@ -36,6 +40,7 @@ class Service:
             get_usage=False, 
             get_diff=True, 
             openai_api_key=None,
+            together_api_key=None,
             serpapi_key=None
         ):
         self.seed = seed # seed for deterministic completions, if set
@@ -43,6 +48,7 @@ class Service:
         self.get_usage = get_usage
         self.get_diff = get_diff
         self.openai_api_key = openai_api_key
+        self.together_api_key = together_api_key
         self.serpapi_key = serpapi_key
         match tokenize_level:
             case 'code':
@@ -60,13 +66,22 @@ class Service:
                 self.encode = lambda x: list(x)
                 self.decode = lambda x: ''.join(x)
     
-    def process(self, prompt=None, code=None, model=None, openai_api_key=None, serpapi_key=None) -> dict:
+    def process(self, 
+                prompt=None, 
+                code=None, 
+                gt_docs=None, 
+                model=None, 
+                openai_api_key=None, 
+                together_api_key=None,
+                serpapi_key=None,
+            ) -> dict:
         openai_api_key = openai_api_key if openai_api_key else self.openai_api_key
+        together_api_key = together_api_key if together_api_key else self.together_api_key
         serpapi_key = serpapi_key if serpapi_key else self.serpapi_key
-        actual_prompt = gen_prompt(prompt, code)
+        actual_prompt = gen_prompt(prompt, code, gt_docs)
         try:
             result = {}
-            combined_result = gptcall(
+            combined_result = call(
                 actual_prompt,
                 model=model if model else self.default_model,
                 system_message=system_message,
@@ -79,7 +94,7 @@ class Service:
 
             output_code = extract_code(result_code)
             result['updatedCode'] = output_code
-            if self.get_diff:
+            if self.get_diff and code:
                 changes = diff(code, output_code, self.encode, self.decode)
                 result['diff'] = changes
 
@@ -88,3 +103,11 @@ class Service:
             if "Incorrect API key" in f"{e}":
                 return {'error': "Incorrect API key"}
             return {'error': f"{e}"}
+
+def call(prompt, model='gpt-4o', **kwargs):
+    if model in ['gpt-4o', 'gpt-4o-mini']:
+        return gptcall(prompt, model=model, **kwargs)
+    elif '/' in model:
+        return tgtcall(prompt, model=model, **kwargs)
+    else:
+        raise NotImplementedError("Platform not supported")

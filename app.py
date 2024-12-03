@@ -26,5 +26,14 @@ def process():
     response = s.process(openai_api_key=openai_api_key, serpapi_key=serpapi_key, **data)
     return jsonify(response), (400 if 'error' in response else 200)
 
+@app.route('/ok', methods=['GET'])
+def ok():
+    return "ok"
+
+@app.route('/test', methods=['POST'])
+def test():
+    print(request.get_json())
+    return { "updatedCode": "def hw():\n    print('Hello, World!')" }
+
 if __name__ == '__main__':
     app.run(host='localhost', port=8080)

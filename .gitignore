@@ -4,3 +4,5 @@ __pycache__/
 *benchmark.json
 *.ipynb
 *failed/
+# ignore results for now
+code_rag_bench/
