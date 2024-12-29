@@ -6,3 +6,4 @@ __pycache__/
 *failed/
 # ignore results for now
 code_rag_bench/
+sample*
